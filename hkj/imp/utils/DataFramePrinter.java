@@ -34,7 +34,38 @@ public class DataFramePrinter {
             printBorder(numCols, colWidths);
         }
     }
+    public static void printExcelGrid(List<List<Integer>> data,boolean is) {
+        if (data == null || data.isEmpty()) {
+            System.out.println("No data to display.");
+            return;
+        }
 
+        int numRows = data.size();
+        int numCols = data.get(0).size();
+
+        // Determine column widths
+        int[] colWidths = new int[numCols];
+        for (int j = 0; j < numCols; j++) {
+            int maxWidth = 0;
+            for (int i = 0; i < numRows; i++) {
+                String cell = formatCell(data.get(i).get(j));
+
+                if (cell.length() > maxWidth) {
+                    maxWidth = cell.length();
+                }
+            }
+            colWidths[j] = maxWidth;
+        }
+
+        // Print top border
+        printBorder(numCols, colWidths);
+
+        // Print data rows
+        for (List<Integer> row : data) {
+            printRow(row, colWidths,true);
+            printBorder(numCols, colWidths);
+        }
+    }
     private static void printBorder(int numCols, int[] colWidths) {
         System.out.print("+");
         for (int j = 0; j < numCols; j++) {
@@ -57,6 +88,29 @@ public class DataFramePrinter {
         System.out.println();
     }
 
+    private static void printRow(List<Integer> row, int[] colWidths,boolean is) {
+        System.out.print("|");
+        for (int j = 0; j < row.size(); j++) {
+            String cell=formatCell(row.get(j));
+            if(j==3 && row.get(j)==(int)-1e9 ||row.get(j)==(int)1e9){
+                cell="INVALID";
+            }else if(j==3){
+                int d=row.get(j);
+                if(d==0){
+                    cell = "EQUAL";
+                }
+                if(d<0){
+                    cell="IMAGINARY";
+                }
+                if(d>0){
+                    cell="REAL";
+                }
+            }
+
+            System.out.print(" " + String.format("%-" + colWidths[j] + "s", cell) + " |");
+        }
+        System.out.println();
+    }
     private static String formatCell(Object obj) {
         if (obj == null) {
             return "";
